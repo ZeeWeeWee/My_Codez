@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket;
+        var username = "";
+
+        function initializeChat() {
+            username = document.getElementById('usernameInput').value;
+            if (username) {
+                document.getElementById('usernameSection').style.display = 'none';
+                document.getElementById('chatSection').style.display = 'block';
+
+                socket = io.connect('http://172.232.21.168:3000');
+                socket.on('connect', function() {
+                    socket.send(username + ' has connected!');
+                });
+                socket.on('message', function(msg) {
+                    document.getElementById('chat').innerHTML += '<br>' + msg;
+                });
+            } else {
+                alert("Please enter a username!");
+            }
+        }
+
+        function sendMessage() {
+            var input = document.getElementById('messageInput').value;
+            socket.send(username + ': ' + input);
+            document.getElementById('messageInput').value = '';
+        }
+    </script>
+</head>
+<body>
+    <div id="usernameSection">
+        Enter your username: <input type="text" id="usernameInput">
+        <button onclick="initializeChat()">Join Chat</button>
+    </div>
+
+    <div id="chatSection" style="display:none;">
+        <div id="chat"></div>
+        <input type="text" id="messageInput">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</body>
+</html>
